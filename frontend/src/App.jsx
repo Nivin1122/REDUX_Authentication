@@ -5,6 +5,8 @@ import Login from './pages/Login'
 import Home from './pages/Home'
 import NotFound from './pages/NotFound'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminLogin from './pages/AdminLogin'
+import Admin_Home from './pages/Admin_Home'
 
 
 function Logout(){
@@ -34,6 +36,8 @@ function App() {
           <Route path='/login' element={<Login/>}/>
           <Route path='/register' element={<RegisterAndLogout/>}/>
           <Route path='*' element={<NotFound/>}/>
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin_home" element={<Admin_Home />} />
         </Routes>
       </BrowserRouter>
     </>

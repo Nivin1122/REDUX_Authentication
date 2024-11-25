@@ -68,6 +68,8 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
+LOGIN_URL = '/admin-login/'
+
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
