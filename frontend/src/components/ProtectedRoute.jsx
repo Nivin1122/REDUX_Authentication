@@ -10,7 +10,7 @@ function ProtectedRoute({ children }) {
 
     useEffect(()=>{
         auth() .catch(()=>setIsAutherized(false))
-    },[])
+    },[])                                                  
 
     const refreshToken = async() => {
         const refreshToken = localStorage.getItem(REFRESH_TOKEN);
@@ -47,10 +47,16 @@ function ProtectedRoute({ children }) {
             setIsAutherized(true)
         }
     }
+    if (isAutherized === null) {
+        return <div>Loading...</div>;
+    }
 
-  return (
-    <div>ProtectedRoute</div>
-  )
+    return isAutherized ? children : <Navigate to="/login" />;
+
+//   return (
+//     <div>ProtectedRoute</div>
+//   )
+
 }
 
 export default ProtectedRoute
