@@ -4,10 +4,16 @@ from rest_framework import generics
 from .serializers import UserSerializers
 from rest_framework.permissions import IsAuthenticated,AllowAny
 
+from rest_framework.permissions import IsAdminUser
+from rest_framework.decorators import permission_classes
+
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 # Create your views here.
 
 
@@ -31,3 +37,15 @@ def admin_login(request):
         else:
             return JsonResponse({'error': 'Invalid credentials or not an admin'}, status=401)
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_users(request):
+    users = User.objects.all()
+    users_data = [
+        {"id": user.id, "username": user.username, "email": user.email}
+        for user in users
+    ]
+    return Response(users_data)

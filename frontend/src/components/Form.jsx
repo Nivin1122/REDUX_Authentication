@@ -5,7 +5,6 @@ import api from '../api'
 import "../components/Form.css"
 
 
-
 function Form({ route,method }) {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
