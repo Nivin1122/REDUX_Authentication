@@ -1,48 +1,57 @@
-import React, { useState } from 'react'
-import { ACCESS_TOKEN,REFRESH_TOKEN } from '../Constants'
-import { useNavigate } from 'react-router-dom'
-import api from '../api'
-import "../components/Form.css"
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser, registerUser } from '../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
+import "../components/Form.css";
 
+function Form({ route, method }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-function Form({ route,method }) {
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
-    const [loading,setLoading] = useState(false)
-    const navigate = useNavigate()
+  const { loading, error } = useSelector((state) => state.auth);
 
-    const name = method === "login" ? "Login" : "Register"
+  const name = method === "login" ? "Login" : "Register";
 
-    const handleSubmit = async (e)=>{
-        setLoading(true);
-        e.preventDefault();
-
-        try{
-            const res = await api.post(route,{username,password })
-            if (method === "login"){
-                localStorage.setItem(ACCESS_TOKEN,res.data.access);
-                localStorage.setItem(REFRESH_TOKEN,res.data.refresh)
-                navigate("/");
-            } else {
-                navigate("/login")
-            }
-
-        }catch(error){
-            alert(error)
-        }finally{
-            setLoading(false)
-        }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (method === "login") {
+      dispatch(loginUser({ username, password }))
+        .unwrap()
+        .then(() => navigate("/"))
+        .catch((err) => alert(err));
+    } else {
+      dispatch(registerUser({ username, password }))
+        .unwrap()
+        .then(() => navigate("/login"))
+        .catch((err) => alert(err));
     }
+  };
 
   return (
     <form onSubmit={handleSubmit} className='form-container'>
-        <h1>{name}</h1>
-        <input className='form-input' type="text" value={username} onChange={(e)=>setUsername(e.target.value)} placeholder='Username'/>
-
-        <input className='form-input' type="password" value={password} onChange={(e)=>setPassword(e.target.value)} placeholder='password'/>
-        <button className='form-button' type='submit'>{name}</button>
+      <h1>{name}</h1>
+      <input
+        className='form-input'
+        type="text"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder='Username'
+      />
+      <input
+        className='form-input'
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder='Password'
+      />
+      <button className='form-button' type='submit' disabled={loading}>
+        {loading ? "Loading..." : name}
+      </button>
+      {error && <p className="form-error">{error}</p>}
     </form>
-  )
+  );
 }
 
-export default Form
+export default Form;
