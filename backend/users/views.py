@@ -34,15 +34,19 @@ def admin_login(request):
         data = json.loads(request.body)
         username = data.get('username')
         password = data.get('password')
+        
+        # Use Django's authentication system
         user = authenticate(request, username=username, password=password)
 
         if user is not None and user.is_staff:
-            # Generate tokens
+            # Generate tokens using SimpleJWT
             refresh = RefreshToken.for_user(user)
             return JsonResponse({
                 'message': 'Admin login successful',
-                'access_token': str(refresh.access_token),
-                'refresh_token': str(refresh)
+                'refresh': str(refresh),  # Use 'refresh' key
+                'access': str(refresh.access_token),  # Use 'access' key
+                # Optional: include additional info
+                'is_staff': user.is_staff
             }, status=200)
         else:
             return JsonResponse({'error': 'Invalid credentials or not an admin'}, status=401)

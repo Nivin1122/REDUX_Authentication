@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminLogin.css';
+import api from '../api'; // Import the configured axios instance
 
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
@@ -12,29 +13,36 @@ const AdminLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage(''); 
+    setMessage('');
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/users/admin-login/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+      const response = await api.post('/users/admin-login/', {
+        username,
+        password
       });
 
-      const data = await response.json();
+      // Assuming the response contains access and refresh tokens
+      localStorage.setItem('access_token', response.data.access_token);
+      localStorage.setItem('refresh_token', response.data.refresh_token);
 
-      if (response.ok) {
-        // You can store the access token if provided by your API
-        localStorage.setItem('access_token', data.access_token); // Adjust this line based on your response
-        setMessage(data.message);
-        navigate('/admin_home'); // Redirect to admin home page
-      } else {
-        setMessage(data.error || 'Login failed');
-      }
+      setMessage(response.data.message);
+      navigate('/admin_home'); // Redirect to admin home page
     } catch (error) {
-      setMessage('Network error. Please try again later.');
+      // Handle different types of errors
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        setMessage(error.response.data.error || 'Login failed');
+      } else if (error.request) {
+        // The request was made but no response was received
+        setMessage('No response from server. Please try again.');
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setMessage('Network error. Please try again later.');
+      }
+      console.error('Login error:', error);
     } finally {
-      setLoading(false); // Stop loading after request is complete
+      setLoading(false);
     }
   };
 
@@ -50,7 +58,8 @@ const AdminLogin = () => {
             className="form-input"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            disabled={loading} // Disable input fields during loading
+            disabled={loading}
+            required
           />
         </div>
         <div className="form-group">
@@ -61,10 +70,15 @@ const AdminLogin = () => {
             className="form-input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            disabled={loading} // Disable input fields during loading
+            disabled={loading}
+            required
           />
         </div>
-        <button type="submit" className="login-button" disabled={loading}>
+        <button 
+          type="submit" 
+          className="login-button" 
+          disabled={loading}
+        >
           {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
