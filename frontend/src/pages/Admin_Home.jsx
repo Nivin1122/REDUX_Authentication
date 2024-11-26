@@ -5,41 +5,75 @@ import { ACCESS_TOKEN } from '../Constants';
 function Admin_Home() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      const token = localStorage.getItem(ACCESS_TOKEN); // Get the access token
-      if (!token) {
-        console.error('No access token found');
-        return;
-      }
+    fetchUsers();
+  }, []);
 
+  const fetchUsers = async () => {
+    const token = localStorage.getItem(ACCESS_TOKEN);
+    if (!token) {
+      setError('No access token found');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/users/all-users/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Error fetching users');
+      }
+    } catch (error) {
+      setError('Network error while fetching users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    const token = localStorage.getItem(ACCESS_TOKEN);
+    if (!token) {
+      alert('No access token found. Please login again.');
+      return;
+    }
+
+    if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        const response = await fetch('http://127.0.0.1:8000/users/all-users/', {
-          method: 'GET',
+        const response = await fetch(`http://127.0.0.1:8000/users/delete-user/${userId}/`, {
+          method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`, // Include the token
+            'Authorization': `Bearer ${token}`,
           },
         });
 
         if (response.ok) {
-          const data = await response.json();
-          setUsers(data);
+          setUsers(users.filter(user => user.id !== userId));
+          alert('User deleted successfully');
         } else {
-          console.error('Error fetching users:', response.statusText);
+          const errorData = await response.json();
+          alert(errorData.error || 'Failed to delete user');
         }
       } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false);
+        alert('Network error while deleting user');
       }
-    };
+    }
+  };
 
-    fetchUsers();
-  }, []);
-
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="loading">Loading...</div>;
+  if (error) return <div className="error">{error}</div>;
 
   return (
     <div className="admin-home-container">
@@ -50,6 +84,12 @@ function Admin_Home() {
             <h3>{user.username}</h3>
             <p>Email: {user.email || 'N/A'}</p>
             <p>ID: {user.id}</p>
+            <button 
+              onClick={() => handleDeleteUser(user.id)}
+              className="delete-button"
+            >
+              Delete User
+            </button>
           </div>
         ))}
       </div>
