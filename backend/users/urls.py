@@ -6,4 +6,5 @@ urlpatterns = [
     path('all-users/', get_all_users, name='get-all-users'),
     path('delete-user/<int:user_id>/', delete_user, name='delete-user'),
     path('user/profile/',UserProfileView.as_view(),name='user_profile'),
+    path('user/profile/update/', UserProfileView.as_view(), name='user_profile_update'),
 ]

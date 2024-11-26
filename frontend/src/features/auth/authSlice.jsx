@@ -11,7 +11,7 @@ const initialState = {
   isAuthenticated: !!localStorage.getItem(ACCESS_TOKEN),
 };
 
-// Login Thunk
+
 export const loginUser = createAsyncThunk('auth/login', async ({ username, password }, thunkAPI) => {
   try {
     const response = await api.post('/users/token/', { username, password });
@@ -23,7 +23,7 @@ export const loginUser = createAsyncThunk('auth/login', async ({ username, passw
   }
 });
 
-// Register Thunk
+
 export const registerUser = createAsyncThunk('auth/register', async ({ username, password }, thunkAPI) => {
   try {
     await api.post('/users/user/register/', { username, password });
@@ -33,7 +33,7 @@ export const registerUser = createAsyncThunk('auth/register', async ({ username,
   }
 });
 
-// Logout Action
+
 export const logoutUser = () => (dispatch) => {
   localStorage.removeItem(ACCESS_TOKEN);
   localStorage.removeItem(REFRESH_TOKEN);
@@ -53,7 +53,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Login
+
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -69,7 +69,7 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Register
+      
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;

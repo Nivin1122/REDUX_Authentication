@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../api';
 
-// Async thunk to fetch all users
+
 export const fetchUsers = createAsyncThunk(
   'users/fetchUsers',
   async (token, { rejectWithValue }) => {
@@ -18,7 +18,6 @@ export const fetchUsers = createAsyncThunk(
   }
 );
 
-// Async thunk to delete a user
 export const deleteUser = createAsyncThunk(
   'users/deleteUser',
   async ({ userId, token }, { rejectWithValue }) => {

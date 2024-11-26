@@ -35,17 +35,14 @@ def admin_login(request):
         username = data.get('username')
         password = data.get('password')
         
-        # Use Django's authentication system
         user = authenticate(request, username=username, password=password)
 
         if user is not None and user.is_staff:
-            # Generate tokens using SimpleJWT
             refresh = RefreshToken.for_user(user)
             return JsonResponse({
                 'message': 'Admin login successful',
-                'refresh': str(refresh),  # Use 'refresh' key
-                'access': str(refresh.access_token),  # Use 'access' key
-                # Optional: include additional info
+                'refresh': str(refresh), 
+                'access': str(refresh.access_token),
                 'is_staff': user.is_staff
             }, status=200)
         else:
@@ -75,13 +72,28 @@ class UserProfileView(APIView):
             profile_data = {
                 'username': user.username,
                 'email': user.email,
-                # 'profile_picture': user.profile_picture.url if user.profile_picture else None,
-                # 'bio': user.bio or ''
             }
             return Response(profile_data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(
                 {'detail': 'Error retrieving profile'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def put(self, request):
+        try:
+            user = request.user
+            data = request.data
+            user.username = data.get("username", user.username)
+            user.email = data.get("email", user.email)
+
+            user.save()
+
+            return Response({"message": "Profile updated successfully"}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {'detail': 'Error updating profile'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 

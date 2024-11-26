@@ -43,7 +43,6 @@ function ProtectedRoute({ children, adminOnly = false }) {
     const auth = async () => {
         const token = localStorage.getItem(ACCESS_TOKEN);
         
-        // If no token exists at all
         if (!token) {
             setIsAuthorized(false);
             return;
@@ -54,7 +53,6 @@ function ProtectedRoute({ children, adminOnly = false }) {
             const tokenExpiration = decode.exp;
             const now = Date.now() / 1000;
 
-            // If token is expired, try to refresh
             if (tokenExpiration < now) {
                 const refreshed = await refreshToken();
                 if (!refreshed) {
