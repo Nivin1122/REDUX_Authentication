@@ -11,11 +11,13 @@ from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from rest_framework.views import APIView
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from rest_framework import status
+from django.contrib.auth import get_user_model
 # Create your views here.
 
 
@@ -33,7 +35,7 @@ def admin_login(request):
         password = data.get('password')
         user = authenticate(request, username=username, password=password)
 
-        if user is not None and user.is_staff:  # Check if user is an admin
+        if user is not None and user.is_staff:
             login(request, user)
             return JsonResponse({'message': 'Admin login successful'}, status=200)
         else:
@@ -53,9 +55,30 @@ def get_all_users(request):
     return Response(users_data)
 
 
+User = get_user_model()
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            user = request.user
+            profile_data = {
+                'username': user.username,
+                'email': user.email,
+                # 'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                # 'bio': user.bio or ''
+            }
+            return Response(profile_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {'detail': 'Error retrieving profile'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 
 @api_view(['DELETE'])
-@permission_classes([AllowAny])  # We'll check for admin in the view
+@permission_classes([AllowAny]) 
 def delete_user(request, user_id):
     # Check if the user is admin
     # if not request.user.is_staff:

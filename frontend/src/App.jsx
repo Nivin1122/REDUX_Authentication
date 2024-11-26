@@ -7,6 +7,7 @@ import NotFound from './pages/NotFound'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminLogin from './pages/AdminLogin'
 import Admin_Home from './pages/Admin_Home'
+import UserProfile from './pages/UserProfile'
 
 
 function Logout(){
@@ -38,6 +39,7 @@ function App() {
           <Route path='*' element={<NotFound/>}/>
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin_home" element={<Admin_Home />} />
+          <Route path="/profile" element={<UserProfile/>} />
         </Routes>
       </BrowserRouter>
     </>
