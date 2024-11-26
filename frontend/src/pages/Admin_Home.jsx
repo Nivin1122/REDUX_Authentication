@@ -1,48 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import './AdminHome.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUsers,deleteUser } from '../features/auth/usersSlice';
 import { ACCESS_TOKEN } from '../Constants';
 
 function Admin_Home() {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const { users, loading, error } = useSelector((state) => state.users);
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
     const token = localStorage.getItem(ACCESS_TOKEN);
-    if (!token) {
-      setError('No access token found');
-      setLoading(false);
-      return;
+    if (token) {
+      dispatch(fetchUsers(token));
+    } else {
+      alert('No access token found');
     }
+  }, [dispatch]);
 
-    try {
-      const response = await fetch('http://127.0.0.1:8000/users/all-users/', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data);
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Error fetching users');
-      }
-    } catch (error) {
-      setError('Network error while fetching users');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteUser = async (userId) => {
+  const handleDeleteUser = (userId) => {
     const token = localStorage.getItem(ACCESS_TOKEN);
     if (!token) {
       alert('No access token found. Please login again.');
@@ -50,25 +25,7 @@ function Admin_Home() {
     }
 
     if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        const response = await fetch(`http://127.0.0.1:8000/users/delete-user/${userId}/`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          setUsers(users.filter(user => user.id !== userId));
-          alert('User deleted successfully');
-        } else {
-          const errorData = await response.json();
-          alert(errorData.error || 'Failed to delete user');
-        }
-      } catch (error) {
-        alert('Network error while deleting user');
-      }
+      dispatch(deleteUser({ userId, token }));
     }
   };
 
