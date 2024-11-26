@@ -1,0 +1,32 @@
+.home-container {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    text-align: center;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    max-width: 400px;
+    margin: 30px auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .home-container ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .home-container li {
+    margin: 10px 0;
+  }
+  
+  .home-container a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+  }
+  
+  .home-container a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+  }
+  

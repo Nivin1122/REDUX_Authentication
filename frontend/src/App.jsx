@@ -40,6 +40,7 @@ function App() {
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin_home" element={<Admin_Home />} />
           <Route path="/profile" element={<UserProfile/>} />
+          <Route path="/logout" element={<Logout/>} />
         </Routes>
       </BrowserRouter>
     </>
